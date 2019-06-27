@@ -1,0 +1,37 @@
+version: '2'
+services:
+  oauth2oidc-app:
+    image: oauth2oidc
+    environment:
+      - _JAVA_OPTIONS=-Xmx512m -Xms256m
+      - SPRING_PROFILES_ACTIVE=prod,swagger
+      - MANAGEMENT_METRICS_EXPORT_PROMETHEUS_ENABLED=true
+      - SPRING_DATASOURCE_URL=jdbc:mysql://oauth2oidc-mysql:3306/oauth2oidc?useUnicode=true&characterEncoding=utf8&useSSL=false
+      - SPRING_SECURITY_OAUTH2_CLIENT_PROVIDER_OIDC_ISSUER_URI=http://keycloak:9080/auth/realms/jhipster
+      - JHIPSTER_SLEEP=30 # gives time for other services to boot before the application
+      - SPRING_DATA_JEST_URI=http://oauth2oidc-elasticsearch:9200
+      - SPRING_ELASTICSEARCH_REST_URIS=http://oauth2oidc-elasticsearch:9200
+      - SPRING_KAFKA_CONSUMER_BOOTSTRAP_SERVERS=kafka:9092
+      - SPRING_KAFKA_PRODUCER_BOOTSTRAP_SERVERS=kafka:9092
+  oauth2oidc-mysql:
+    extends:
+      file: mysql.yml
+      service: oauth2oidc-mysql
+  oauth2oidc-elasticsearch:
+    extends:
+      file: elasticsearch.yml
+      service: oauth2oidc-elasticsearch
+  kafka:
+    extends:
+      file: kafka.yml
+      service: kafka
+    environment:
+      - KAFKA_ADVERTISED_HOST_NAME=kafka
+  zookeeper:
+    extends:
+      file: kafka.yml
+      service: zookeeper
+  keycloak:
+    extends:
+      file: keycloak.yml
+      service: keycloak
